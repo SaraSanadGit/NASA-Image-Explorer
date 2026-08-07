@@ -25,6 +25,10 @@ public class NasaApod {
     @SerializedName("media_type")
     private String mediaType;
 
+    @SerializedName("hdurl")
+    private String hdUrl;
+
+
     public String getTitle() {
         return title;
     }
@@ -43,5 +47,9 @@ public class NasaApod {
 
     public String getMediaType() {
         return mediaType;
+    }
+
+    public String getHdUrl() {
+        return hdUrl;
     }
 }

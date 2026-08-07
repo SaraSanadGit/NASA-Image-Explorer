@@ -25,22 +25,12 @@ import retrofit2.Response;
 
 /**
  * Home Fragment for NASA Image Explorer.
- * This fragment represents the main screen of the application.
  *
  * @author Sara
  * @version 1.0
  */
 public class HomeFragment extends Fragment {
 
-
-    /**
-     * Creates the fragment view.
-     *
-     * @param inflater Layout inflater
-     * @param container Parent container
-     * @param savedInstanceState Saved state
-     * @return Created view
-     */
     private static final String API_KEY =
             "0qhReUQyzRftgLCT4jAgblGqOQXjJPknqEMzgAZC";
 
@@ -49,6 +39,8 @@ public class HomeFragment extends Fragment {
     private TextView tvDate;
     private TextView tvExplanation;
     private ProgressBar progressBar;
+
+
     @Nullable
     @Override
     public View onCreateView(
@@ -63,68 +55,112 @@ public class HomeFragment extends Fragment {
                 false
         );
 
+
         imgNasa = view.findViewById(R.id.imgNasa);
         tvTitle = view.findViewById(R.id.tvTitle);
         tvDate = view.findViewById(R.id.tvDate);
         tvExplanation = view.findViewById(R.id.tvExplanation);
         progressBar = view.findViewById(R.id.progressBar);
 
+
         loadApod();
+
 
         return view;
     }
+
+
     private void loadApod() {
 
         progressBar.setVisibility(View.VISIBLE);
 
+
         NasaApiService apiService =
-                RetrofitClient.getClient().create(NasaApiService.class);
+                RetrofitClient.getClient()
+                        .create(NasaApiService.class);
+
 
         Call<NasaApod> call =
                 apiService.getPictureOfTheDay(API_KEY);
 
+
         call.enqueue(new Callback<NasaApod>() {
 
             @Override
-            public void onResponse(Call<NasaApod> call,
-                                   Response<NasaApod> response) {
+            public void onResponse(
+                    Call<NasaApod> call,
+                    Response<NasaApod> response) {
+
 
                 progressBar.setVisibility(View.GONE);
+
 
                 if (response.isSuccessful()
                         && response.body() != null) {
 
+
                     NasaApod apod = response.body();
 
-                    tvTitle.setText(apod.getTitle());
-                    tvDate.setText(apod.getDate());
-                    tvExplanation.setText(apod.getExplanation());
 
-                    Glide.with(requireContext())
-                            .load(apod.getUrl())
-                            .into(imgNasa);
+                    tvTitle.setText(apod.getTitle());
+
+                    tvDate.setText(apod.getDate());
+
+                    tvExplanation.setText(
+                            apod.getExplanation()
+                    );
+
+
+                    if ("image".equals(apod.getMediaType())) {
+
+
+                        Glide.with(requireContext())
+                                .load(apod.getHdUrl())
+                                .placeholder(
+                                        android.R.drawable.ic_menu_gallery
+                                )
+                                .into(imgNasa);
+
+
+                    } else {
+
+
+                        Toast.makeText(
+                                requireContext(),
+                                "NASA returned a video today.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                    }
+
 
                 } else {
 
+
                     Toast.makeText(
                             requireContext(),
-                            "Failed to load data.",
+                            "Failed to load NASA data.",
                             Toast.LENGTH_SHORT
                     ).show();
+
 
                 }
 
             }
 
+
             @Override
-            public void onFailure(Call<NasaApod> call,
-                                  Throwable t) {
+            public void onFailure(
+                    Call<NasaApod> call,
+                    Throwable t) {
+
 
                 progressBar.setVisibility(View.GONE);
 
+
                 Toast.makeText(
                         requireContext(),
-                        t.getMessage(),
+                        "Error: " + t.getMessage(),
                         Toast.LENGTH_LONG
                 ).show();
 
@@ -133,4 +169,5 @@ public class HomeFragment extends Fragment {
         });
 
     }
+
 }
