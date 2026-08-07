@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.sara.nasaimageexplorer.fragment.HomeFragment;
+import android.content.Intent;
 
 /**
  * Main Activity of NASA Image Explorer application.
@@ -68,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
         navigationView.setNavigationItemSelectedListener(
                 item -> {
 
@@ -76,11 +76,25 @@ public class MainActivity extends AppCompatActivity {
 
                     if (id == R.id.nav_search) {
 
-                        // Search activity will be added later
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(
+                                        R.id.fragment_container,
+                                        new HomeFragment()
+                                )
+                                .commit();
+
 
                     } else if (id == R.id.nav_favorites) {
 
-                        // Favorites activity will be added later
+                        Intent intent =
+                                new Intent(
+                                        MainActivity.this,
+                                        FavoritesActivity.class
+                                );
+
+                        startActivity(intent);
+
                     }
 
                     drawerLayout.closeDrawers();
