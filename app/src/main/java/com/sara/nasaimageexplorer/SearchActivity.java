@@ -27,7 +27,6 @@ import com.sara.nasaimageexplorer.utils.SharedPreferencesManager;
 import java.util.Calendar;
 
 /**
-
  * Search Activity.
  *
  * Presentation layer responsible for displaying
@@ -83,7 +82,6 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_search);
@@ -133,6 +131,24 @@ public class SearchActivity extends AppCompatActivity {
         preferencesManager =
                 new SharedPreferencesManager(this);
 
+        /*
+         * Load the last searched date saved
+         * in SharedPreferences.
+         */
+        String lastDate =
+                preferencesManager.getLastDate();
+
+        if (lastDate != null
+                && !lastDate.isEmpty()) {
+
+            selectedDate =
+                    lastDate;
+
+            etDate.setText(
+                    lastDate
+            );
+        }
+
         nasaApiService =
                 new NasaApiService();
 
@@ -164,12 +180,9 @@ public class SearchActivity extends AppCompatActivity {
         tvHdUrl.setOnClickListener(
                 v -> openUrl(hdUrl)
         );
-
-
     }
 
     /**
-
      * Opens the Android date picker.
      */
     private void showDatePicker() {
@@ -181,7 +194,6 @@ public class SearchActivity extends AppCompatActivity {
                 new DatePickerDialog(
                         this,
                         (view, year, month, day) -> {
-
 
                             selectedDate =
                                     year + "-" +
@@ -212,12 +224,10 @@ public class SearchActivity extends AppCompatActivity {
                         calendar.get(Calendar.DAY_OF_MONTH)
                 );
 
-
         dialog.show();
     }
 
     /**
-
      * Searches NASA APOD using the date
      * entered into the EditText.
      */
@@ -230,7 +240,6 @@ public class SearchActivity extends AppCompatActivity {
 
         if (enteredDate.isEmpty()) {
 
-
             etDate.setError(
                     "Enter a date"
             );
@@ -238,14 +247,11 @@ public class SearchActivity extends AppCompatActivity {
             etDate.requestFocus();
 
             return;
-
-
         }
 
         if (!enteredDate.matches(
                 "\\d{4}-\\d{2}-\\d{2}"
         )) {
-
 
             etDate.setError(
                     "Use YYYY-MM-DD format"
@@ -254,8 +260,6 @@ public class SearchActivity extends AppCompatActivity {
             etDate.requestFocus();
 
             return;
-
-
         }
 
         selectedDate =
@@ -271,7 +275,6 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /**
-
      * Saves the currently displayed image
      * as a favorite through the Business layer.
      *
@@ -283,7 +286,6 @@ public class SearchActivity extends AppCompatActivity {
                 || imageTitle.isEmpty()
                 || imageUrl.isEmpty()) {
 
-
             Toast.makeText(
                     this,
                     "Search for an image first",
@@ -291,8 +293,6 @@ public class SearchActivity extends AppCompatActivity {
             ).show();
 
             return;
-
-
         }
 
         if (favoriteService.addFavorite(
@@ -302,29 +302,23 @@ public class SearchActivity extends AppCompatActivity {
                 hdUrl
         )) {
 
-
             Snackbar.make(
                     view,
                     "Saved to Favorites",
                     Snackbar.LENGTH_LONG
             ).show();
 
-
         } else {
-
 
             Toast.makeText(
                     this,
                     "Save failed",
                     Toast.LENGTH_SHORT
             ).show();
-
-
         }
     }
 
     /**
-
      * Opens a URL in the Android browser.
      *
      * @param urlString URL to open
@@ -334,7 +328,6 @@ public class SearchActivity extends AppCompatActivity {
         if (urlString == null
                 || urlString.isEmpty()) {
 
-
             Toast.makeText(
                     this,
                     "URL not available",
@@ -342,12 +335,9 @@ public class SearchActivity extends AppCompatActivity {
             ).show();
 
             return;
-
-
         }
 
         try {
-
 
             Intent browserIntent =
                     new Intent(
@@ -357,22 +347,17 @@ public class SearchActivity extends AppCompatActivity {
 
             startActivity(browserIntent);
 
-
         } catch (Exception e) {
-
 
             Toast.makeText(
                     this,
                     "Unable to open URL",
                     Toast.LENGTH_SHORT
             ).show();
-
-
         }
     }
 
     /**
-
      * Performs the NASA API request
      * through the Business layer.
      */
@@ -382,12 +367,9 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
 
-
             progressBar.setVisibility(
                     View.VISIBLE
             );
-
-
         }
 
         @Override
@@ -395,19 +377,15 @@ public class SearchActivity extends AppCompatActivity {
                 String... dates
         ) {
 
-
             return nasaApiService.getApodData(
                     dates[0]
             );
-
-
         }
 
         @Override
         protected void onPostExecute(
                 String result
         ) {
-
 
             progressBar.setVisibility(
                     View.GONE
@@ -482,8 +460,6 @@ public class SearchActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT
                 ).show();
             }
-
-
         }
     }
 }
