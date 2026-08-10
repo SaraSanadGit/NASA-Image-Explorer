@@ -14,15 +14,15 @@
 
 
 
-
-
     <TextView
+
+        android:id="@+id/tvHelpTitle"
 
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
 
-        android:text="Favorite NASA Images"
+        android:text="NASA Image Explorer Help"
 
         android:textSize="22sp"
 
@@ -30,20 +30,24 @@
 
         android:gravity="center"
 
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="20dp"/>
 
 
 
 
+    <TextView
 
-
-    <ListView
-
-        android:id="@+id/listFavorites"
+        android:id="@+id/tvHelpContent"
 
         android:layout_width="match_parent"
 
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+
+        android:textSize="16sp"
+
+        android:text="Instructions"
+
+        android:lineSpacingExtra="8dp"/>
 
 
 

@@ -3,19 +3,48 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
+
     <item
+
         android:id="@+id/nav_home"
-        android:title="Home"/>
+
+        android:title="Home"
+
+        android:icon="@android:drawable/ic_menu_view"/>
+
+
 
 
     <item
+
         android:id="@+id/nav_search"
-        android:title="Search NASA"/>
+
+        android:title="Search NASA Image"
+
+        android:icon="@android:drawable/ic_menu_search"/>
+
+
 
 
     <item
+
         android:id="@+id/nav_favorites"
-        android:title="Favorites"/>
+
+        android:title="Favorites"
+
+        android:icon="@android:drawable/ic_menu_save"/>
+
+
+
+
+    <item
+
+        android:id="@+id/nav_help"
+
+        android:title="Help"
+
+        android:icon="@android:drawable/ic_menu_help"/>
+
 
 
 </menu>

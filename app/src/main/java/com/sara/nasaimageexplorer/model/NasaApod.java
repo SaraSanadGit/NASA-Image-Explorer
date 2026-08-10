@@ -1,55 +1,135 @@
 package com.sara.nasaimageexplorer.model;
 
-import com.google.gson.annotations.SerializedName;
 
 /**
- * Model class for NASA APOD response.
+ * Model class for NASA APOD API response.
  *
  * @author Sara
  * @version 1.0
  */
 public class NasaApod {
 
-    @SerializedName("title")
+
+
     private String title;
 
-    @SerializedName("date")
     private String date;
 
-    @SerializedName("explanation")
     private String explanation;
 
-    @SerializedName("url")
     private String url;
 
-    @SerializedName("media_type")
-    private String mediaType;
-
-    @SerializedName("hdurl")
-    private String hdUrl;
+    private String hdurl;
 
 
-    public String getTitle() {
+
+
+
+
+
+    public String getTitle(){
+
         return title;
+
     }
 
-    public String getDate() {
+
+
+
+
+    public void setTitle(String title){
+
+        this.title = title;
+
+    }
+
+
+
+
+
+
+    public String getDate(){
+
         return date;
+
     }
 
-    public String getExplanation() {
+
+
+
+
+    public void setDate(String date){
+
+        this.date = date;
+
+    }
+
+
+
+
+
+
+
+    public String getExplanation(){
+
         return explanation;
+
     }
 
-    public String getUrl() {
+
+
+
+
+    public void setExplanation(String explanation){
+
+        this.explanation = explanation;
+
+    }
+
+
+
+
+
+
+
+    public String getUrl(){
+
         return url;
+
     }
 
-    public String getMediaType() {
-        return mediaType;
+
+
+
+
+    public void setUrl(String url){
+
+        this.url = url;
+
     }
 
-    public String getHdUrl() {
-        return hdUrl;
+
+
+
+
+
+
+    public String getHdUrl(){
+
+        return hdurl;
+
     }
+
+
+
+
+
+    public void setHdUrl(String hdurl){
+
+        this.hdurl = hdurl;
+
+    }
+
+
+
 }
