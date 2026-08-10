@@ -1,6 +1,8 @@
 package com.sara.nasaimageexplorer;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -35,8 +37,10 @@ import java.util.Calendar;
  * Allows users to search NASA images by selecting
  * a date or entering a date manually.
  *
+ * Image URLs can be opened in the Android browser.
+ *
  * @author Sara
- * @version 6.0
+ * @version 7.0
  */
 public class SearchActivity extends AppCompatActivity {
 
@@ -57,6 +61,8 @@ public class SearchActivity extends AppCompatActivity {
     private TextView tvResultDate;
 
     private TextView tvUrl;
+
+    private TextView tvHdUrl;
 
     private ProgressBar progressBar;
 
@@ -112,6 +118,9 @@ public class SearchActivity extends AppCompatActivity {
         tvUrl =
                 findViewById(R.id.tvUrl);
 
+        tvHdUrl =
+                findViewById(R.id.tvHdUrl);
+
         progressBar =
                 findViewById(R.id.progressBar);
 
@@ -131,7 +140,6 @@ public class SearchActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(
                     "Search NASA Image"
             );
-
         }
 
         btnDate.setOnClickListener(
@@ -144,6 +152,14 @@ public class SearchActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(
                 v -> saveFavorite(v)
+        );
+
+        tvUrl.setOnClickListener(
+                v -> openUrl(imageUrl)
+        );
+
+        tvHdUrl.setOnClickListener(
+                v -> openUrl(hdUrl)
         );
 
 
@@ -220,7 +236,6 @@ public class SearchActivity extends AppCompatActivity {
 
             return;
 
-
         }
 
         if (!enteredDate.matches(
@@ -296,6 +311,54 @@ public class SearchActivity extends AppCompatActivity {
             Toast.makeText(
                     this,
                     "Save failed",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+
+        }
+    }
+
+    /**
+
+     * Opens a URL in the Android browser.
+     *
+     * @param urlString URL to open
+     */
+    private void openUrl(String urlString) {
+
+        if (urlString == null
+                || urlString.isEmpty()) {
+
+
+            Toast.makeText(
+                    this,
+                    "URL not available",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+
+
+        }
+
+        try {
+
+
+            Intent browserIntent =
+                    new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(urlString)
+                    );
+
+            startActivity(browserIntent);
+
+
+        } catch (Exception e) {
+
+
+            Toast.makeText(
+                    this,
+                    "Unable to open URL",
                     Toast.LENGTH_SHORT
             ).show();
 
@@ -447,6 +510,20 @@ public class SearchActivity extends AppCompatActivity {
                 tvUrl.setText(
                         imageUrl
                 );
+
+                if (hdUrl != null
+                        && !hdUrl.isEmpty()) {
+
+                    tvHdUrl.setText(
+                            hdUrl
+                    );
+
+                } else {
+
+                    tvHdUrl.setText(
+                            "HD image not available"
+                    );
+                }
 
                 Glide.with(
                                 SearchActivity.this

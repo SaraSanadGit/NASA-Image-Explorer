@@ -78,13 +78,38 @@
                 android:layout_marginTop="8dp" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Image URL"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp" />
+
+            <TextView
                 android:id="@+id/tvUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:autoLink="web"
                 android:linksClickable="true"
-                android:layout_marginTop="8dp" />
+                android:clickable="true"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="HD Image URL"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp" />
+
+            <TextView
+                android:id="@+id/tvHdUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:clickable="true"
+                android:layout_marginTop="5dp" />
 
             <Button
                 android:id="@+id/btnSave"
