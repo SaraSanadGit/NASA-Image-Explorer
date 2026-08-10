@@ -11,15 +11,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.sara.nasaimageexplorer.business.FavoriteService;
 import com.sara.nasaimageexplorer.database.DatabaseHelper;
 import com.sara.nasaimageexplorer.database.FavoriteDao;
 import com.sara.nasaimageexplorer.model.FavoriteImage;
 
 /**
+
  * Displays details of a selected favorite NASA image.
  *
+ * Uses FavoriteService from the Business layer
+ * for favorite image operations.
+ *
  * @author Sara
- * @version 4.0
+ * @version 8.3
  */
 public class FavoriteDetailActivity extends AppCompatActivity {
 
@@ -39,15 +44,20 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
     private FavoriteDao favoriteDao;
 
+    private FavoriteService favoriteService;
+
     private FavoriteImage favoriteImage;
 
     /**
+
      * Creates the Favorite Detail activity.
      *
      * @param savedInstanceState saved activity state
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(
+            Bundle savedInstanceState
+    ) {
 
         super.onCreate(savedInstanceState);
 
@@ -91,6 +101,11 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         favoriteDao =
                 new FavoriteDao(databaseHelper);
 
+        favoriteService =
+                new FavoriteService(
+                        favoriteDao
+                );
+
         int favoriteId =
                 getIntent().getIntExtra(
                         "favorite_id",
@@ -99,6 +114,7 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         if (favoriteId == -1) {
 
+
             Toast.makeText(
                     this,
                     "Favorite not found",
@@ -108,6 +124,8 @@ public class FavoriteDetailActivity extends AppCompatActivity {
             finish();
 
             return;
+
+
         }
 
         loadFavorite(favoriteId);
@@ -115,21 +133,49 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(
                 v -> deleteFavorite()
         );
+
+        tvFavoriteUrl.setOnClickListener(
+                v -> openUrl(
+                        favoriteImage != null
+                                ? favoriteImage.getImageUrl()
+                                : ""
+                )
+        );
+
+        tvFavoriteHdUrl.setOnClickListener(
+                v -> {
+
+
+                    if (favoriteImage != null) {
+
+                        openUrl(
+                                favoriteImage.getHdUrl()
+                        );
+                    }
+                }
+
+
+        );
     }
 
     /**
-     * Loads the selected favorite from SQLite.
+
+     * Loads the selected favorite through
+     * the Business layer.
      *
      * @param favoriteId database ID
      */
-    private void loadFavorite(int favoriteId) {
+    private void loadFavorite(
+            int favoriteId
+    ) {
 
         favoriteImage =
-                favoriteDao.getFavoriteById(
+                favoriteService.getFavoriteById(
                         favoriteId
                 );
 
         if (favoriteImage == null) {
+
 
             Toast.makeText(
                     this,
@@ -140,6 +186,8 @@ public class FavoriteDetailActivity extends AppCompatActivity {
             finish();
 
             return;
+
+
         }
 
         tvFavoriteTitle.setText(
@@ -157,21 +205,29 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         String hdUrl =
                 favoriteImage.getHdUrl();
 
-        if (hdUrl != null && !hdUrl.isEmpty()) {
+        if (hdUrl != null
+                && !hdUrl.isEmpty()) {
+
 
             tvFavoriteHdUrl.setText(
                     hdUrl
             );
 
+
         } else {
+
 
             tvFavoriteHdUrl.setText(
                     "HD image not available"
             );
+
+
         }
 
         Glide.with(this)
-                .load(favoriteImage.getImageUrl())
+                .load(
+                        favoriteImage.getImageUrl()
+                )
                 .placeholder(
                         android.R.drawable.ic_menu_gallery
                 )
@@ -182,21 +238,27 @@ public class FavoriteDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * Deletes the current favorite image.
+
+     * Deletes the current favorite image
+     * through the Business layer.
      */
     private void deleteFavorite() {
 
         if (favoriteImage == null) {
 
+
             return;
+
+
         }
 
         boolean deleted =
-                favoriteDao.deleteFavorite(
+                favoriteService.deleteFavorite(
                         favoriteImage.getId()
                 );
 
         if (deleted) {
+
 
             Toast.makeText(
                     this,
@@ -206,14 +268,72 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
             finish();
 
+
         } else {
+
 
             Toast.makeText(
                     this,
                     "Delete failed",
                     Toast.LENGTH_SHORT
             ).show();
+
+
+        }
+    }
+
+    /**
+
+     * Opens a URL in the Android browser.
+     *
+     * @param urlString URL to open
+     */
+    private void openUrl(
+            String urlString
+    ) {
+
+        if (urlString == null
+                || urlString.isEmpty()
+                || urlString.equals(
+                "HD image not available"
+        )) {
+
+
+            Toast.makeText(
+                    this,
+                    "URL not available",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+
+
+        }
+
+        try {
+
+
+            Intent browserIntent =
+                    new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(urlString)
+                    );
+
+            startActivity(
+                    browserIntent
+            );
+
+
+        } catch (Exception e) {
+
+
+            Toast.makeText(
+                    this,
+                    "Unable to open URL",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+
         }
     }
 }
-

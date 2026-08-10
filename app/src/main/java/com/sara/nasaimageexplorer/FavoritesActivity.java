@@ -7,8 +7,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.sara.nasaimageexplorer.adapter.FavoriteAdapter;
+import com.sara.nasaimageexplorer.business.FavoriteService;
 import com.sara.nasaimageexplorer.database.DatabaseHelper;
 import com.sara.nasaimageexplorer.database.FavoriteDao;
 import com.sara.nasaimageexplorer.model.FavoriteImage;
@@ -16,12 +16,14 @@ import com.sara.nasaimageexplorer.model.FavoriteImage;
 import java.util.ArrayList;
 
 /**
+
  * Displays saved NASA favorite images.
  *
- * Uses FavoriteDao for database access.
+ * Uses FavoriteService from the Business layer
+ * for favorite image operations.
  *
  * @author Sara
- * @version 3.0
+ * @version 8.2
  */
 public class FavoritesActivity extends AppCompatActivity {
 
@@ -31,11 +33,14 @@ public class FavoritesActivity extends AppCompatActivity {
 
     private FavoriteDao favoriteDao;
 
+    private FavoriteService favoriteService;
+
     private ArrayList<FavoriteImage> favorites;
 
     private FavoriteAdapter adapter;
 
     /**
+
      * Creates the Favorites activity.
      *
      * @param savedInstanceState saved activity state
@@ -45,7 +50,9 @@ public class FavoritesActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_favorites);
+        setContentView(
+                R.layout.activity_favorites
+        );
 
         listFavorites =
                 findViewById(
@@ -58,16 +65,22 @@ public class FavoritesActivity extends AppCompatActivity {
         favoriteDao =
                 new FavoriteDao(databaseHelper);
 
+        favoriteService =
+                new FavoriteService(
+                        favoriteDao
+                );
+
         loadFavorites();
     }
 
     /**
-     * Loads favorite images from the database.
+
+     * Loads favorite images through the Business layer.
      */
     private void loadFavorites() {
 
         favorites =
-                favoriteDao.getFavorites();
+                favoriteService.getFavorites();
 
         adapter =
                 new FavoriteAdapter(
@@ -75,12 +88,15 @@ public class FavoritesActivity extends AppCompatActivity {
                         favorites,
                         new FavoriteAdapter.OnFavoriteClickListener() {
 
+
                             @Override
                             public void onFavoriteClick(
                                     FavoriteImage favorite
                             ) {
 
-                                openFavoriteDetails(favorite);
+                                openFavoriteDetails(
+                                        favorite
+                                );
                             }
 
                             @Override
@@ -88,15 +104,21 @@ public class FavoritesActivity extends AppCompatActivity {
                                     FavoriteImage favorite
                             ) {
 
-                                deleteFavorite(favorite);
+                                deleteFavorite(
+                                        favorite
+                                );
                             }
                         }
                 );
 
-        listFavorites.setAdapter(adapter);
+
+        listFavorites.setAdapter(
+                adapter
+        );
     }
 
     /**
+
      * Opens the details screen for a favorite image.
      *
      * @param favorite selected favorite image
@@ -120,7 +142,8 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
     /**
-     * Deletes a favorite image.
+
+     * Deletes a favorite image through the Business layer.
      *
      * @param favorite favorite image to delete
      */
@@ -129,13 +152,16 @@ public class FavoritesActivity extends AppCompatActivity {
     ) {
 
         boolean deleted =
-                favoriteDao.deleteFavorite(
+                favoriteService.deleteFavorite(
                         favorite.getId()
                 );
 
         if (deleted) {
 
-            favorites.remove(favorite);
+
+            favorites.remove(
+                    favorite
+            );
 
             adapter.notifyDataSetChanged();
 
@@ -145,17 +171,22 @@ public class FavoritesActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
 
+
         } else {
+
 
             Toast.makeText(
                     this,
                     "Delete failed",
                     Toast.LENGTH_SHORT
             ).show();
+
+
         }
     }
 
     /**
+
      * Reloads favorites when returning to this activity.
      */
     @Override
@@ -163,10 +194,12 @@ public class FavoritesActivity extends AppCompatActivity {
 
         super.onResume();
 
-        if (favoriteDao != null) {
+        if (favoriteService != null) {
+
 
             loadFavorites();
+
+
         }
     }
 }
-

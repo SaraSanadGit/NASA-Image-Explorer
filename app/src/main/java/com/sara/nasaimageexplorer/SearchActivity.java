@@ -18,29 +18,25 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
+import com.sara.nasaimageexplorer.business.FavoriteService;
+import com.sara.nasaimageexplorer.business.NasaApiService;
 import com.sara.nasaimageexplorer.database.DatabaseHelper;
 import com.sara.nasaimageexplorer.database.FavoriteDao;
 import com.sara.nasaimageexplorer.utils.SharedPreferencesManager;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Calendar;
 
 /**
 
  * Search Activity.
  *
- * Allows users to search NASA images by selecting
- * a date or entering a date manually.
+ * Presentation layer responsible for displaying
+ * NASA image search results and handling user actions.
  *
- * Image URLs can be opened in the Android browser.
+ * Business operations are handled by service classes.
  *
  * @author Sara
- * @version 7.0
+ * @version 8.1
  */
 public class SearchActivity extends AppCompatActivity {
 
@@ -78,10 +74,11 @@ public class SearchActivity extends AppCompatActivity {
 
     private FavoriteDao favoriteDao;
 
+    private FavoriteService favoriteService;
+
     private SharedPreferencesManager preferencesManager;
 
-    private static final String API_KEY =
-            "0qhReUQyzRftgLCT4jAgblGqOQXjJPknqEMzgAZC";
+    private NasaApiService nasaApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +127,14 @@ public class SearchActivity extends AppCompatActivity {
         favoriteDao =
                 new FavoriteDao(databaseHelper);
 
+        favoriteService =
+                new FavoriteService(favoriteDao);
+
         preferencesManager =
                 new SharedPreferencesManager(this);
+
+        nasaApiService =
+                new NasaApiService();
 
         setSupportActionBar(toolbarSearch);
 
@@ -236,6 +239,7 @@ public class SearchActivity extends AppCompatActivity {
 
             return;
 
+
         }
 
         if (!enteredDate.matches(
@@ -254,7 +258,8 @@ public class SearchActivity extends AppCompatActivity {
 
         }
 
-        selectedDate = enteredDate;
+        selectedDate =
+                enteredDate;
 
         preferencesManager.saveLastDate(
                 selectedDate
@@ -268,7 +273,7 @@ public class SearchActivity extends AppCompatActivity {
     /**
 
      * Saves the currently displayed image
-     * as a favorite.
+     * as a favorite through the Business layer.
      *
      * @param view clicked view
      */
@@ -290,7 +295,7 @@ public class SearchActivity extends AppCompatActivity {
 
         }
 
-        if (favoriteDao.addFavorite(
+        if (favoriteService.addFavorite(
                 selectedDate,
                 imageTitle,
                 imageUrl,
@@ -368,7 +373,8 @@ public class SearchActivity extends AppCompatActivity {
 
     /**
 
-     * Performs the NASA API request.
+     * Performs the NASA API request
+     * through the Business layer.
      */
     private class NasaTask
             extends AsyncTask<String, Void, String> {
@@ -390,68 +396,9 @@ public class SearchActivity extends AppCompatActivity {
         ) {
 
 
-            HttpURLConnection connection =
-                    null;
-
-            try {
-
-                URL url =
-                        new URL(
-                                "https://api.nasa.gov/planetary/apod?api_key="
-                                        + API_KEY
-                                        + "&date="
-                                        + dates[0]
-                        );
-
-                connection =
-                        (HttpURLConnection)
-                                url.openConnection();
-
-                connection.setRequestMethod(
-                        "GET"
-                );
-
-                connection.setConnectTimeout(
-                        10000
-                );
-
-                connection.setReadTimeout(
-                        10000
-                );
-
-                BufferedReader reader =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        connection.getInputStream()
-                                )
-                        );
-
-                StringBuilder result =
-                        new StringBuilder();
-
-                String line;
-
-                while ((line =
-                        reader.readLine()) != null) {
-
-                    result.append(line);
-                }
-
-                reader.close();
-
-                return result.toString();
-
-            } catch (Exception e) {
-
-                return null;
-
-            } finally {
-
-                if (connection != null) {
-
-                    connection.disconnect();
-                }
-            }
+            return nasaApiService.getApodData(
+                    dates[0]
+            );
 
 
         }
@@ -480,23 +427,19 @@ public class SearchActivity extends AppCompatActivity {
 
             try {
 
-                JSONObject object =
-                        new JSONObject(result);
-
                 imageTitle =
-                        object.getString(
-                                "title"
+                        nasaApiService.getTitle(
+                                result
                         );
 
                 imageUrl =
-                        object.getString(
-                                "url"
+                        nasaApiService.getImageUrl(
+                                result
                         );
 
                 hdUrl =
-                        object.optString(
-                                "hdurl",
-                                ""
+                        nasaApiService.getHdUrl(
+                                result
                         );
 
                 tvResultTitle.setText(
