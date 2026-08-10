@@ -3,18 +3,14 @@ package com.sara.nasaimageexplorer;
 import android.app.DatePickerDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -36,19 +32,23 @@ import java.util.Calendar;
 
  * Search Activity.
  *
- * Allows users to search NASA images by date.
- * Uses AsyncTask for HTTP request.
+ * Allows users to search NASA images by selecting
+ * a date or entering a date manually.
  *
  * @author Sara
- * @version 5.0
+ * @version 6.0
  */
 public class SearchActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
+    private Toolbar toolbarSearch;
 
     private Button btnDate;
 
+    private Button btnSearch;
+
     private Button btnSave;
+
+    private EditText etDate;
 
     private ImageView imgResult;
 
@@ -64,9 +64,9 @@ public class SearchActivity extends AppCompatActivity {
 
     private String imageUrl = "";
 
-    private String imageHdUrl = "";
-
     private String imageTitle = "";
+
+    private String hdUrl = "";
 
     private DatabaseHelper databaseHelper;
 
@@ -77,60 +77,43 @@ public class SearchActivity extends AppCompatActivity {
     private static final String API_KEY =
             "0qhReUQyzRftgLCT4jAgblGqOQXjJPknqEMzgAZC";
 
-    /**
-
-     * Creates the Search Activity.
-     *
-     * @param savedInstanceState saved activity state
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_search);
 
-        toolbar =
-                findViewById(
-                        R.id.toolbarSearch
-                );
-
-        setSupportActionBar(toolbar);
+        toolbarSearch =
+                findViewById(R.id.toolbarSearch);
 
         btnDate =
-                findViewById(
-                        R.id.btnDate
-                );
+                findViewById(R.id.btnDate);
+
+        btnSearch =
+                findViewById(R.id.btnSearch);
 
         btnSave =
-                findViewById(
-                        R.id.btnSave
-                );
+                findViewById(R.id.btnSave);
+
+        etDate =
+                findViewById(R.id.etDate);
 
         imgResult =
-                findViewById(
-                        R.id.imgResult
-                );
+                findViewById(R.id.imgResult);
 
         tvResultTitle =
-                findViewById(
-                        R.id.tvResultTitle
-                );
+                findViewById(R.id.tvResultTitle);
 
         tvResultDate =
-                findViewById(
-                        R.id.tvResultDate
-                );
+                findViewById(R.id.tvResultDate);
 
         tvUrl =
-                findViewById(
-                        R.id.tvUrl
-                );
+                findViewById(R.id.tvUrl);
 
         progressBar =
-                findViewById(
-                        R.id.progressBar
-                );
+                findViewById(R.id.progressBar);
 
         databaseHelper =
                 new DatabaseHelper(this);
@@ -141,87 +124,138 @@ public class SearchActivity extends AppCompatActivity {
         preferencesManager =
                 new SharedPreferencesManager(this);
 
+        setSupportActionBar(toolbarSearch);
+
+        if (getSupportActionBar() != null) {
+
+            getSupportActionBar().setTitle(
+                    "Search NASA Image"
+            );
+
+        }
+
         btnDate.setOnClickListener(
                 v -> showDatePicker()
+        );
+
+        btnSearch.setOnClickListener(
+                v -> searchByEnteredDate()
         );
 
         btnSave.setOnClickListener(
                 v -> saveFavorite(v)
         );
+
+
     }
 
     /**
 
-     * Creates the toolbar menu.
-     *
-     * @param menu options menu
-     * @return true when the menu is created
+     * Opens the Android date picker.
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    private void showDatePicker() {
 
-        getMenuInflater().inflate(
-                R.menu.toolbar_menu,
-                menu
-        );
+        Calendar calendar =
+                Calendar.getInstance();
 
-        return true;
+        DatePickerDialog dialog =
+                new DatePickerDialog(
+                        this,
+                        (view, year, month, day) -> {
+
+
+                            selectedDate =
+                                    year + "-" +
+                                            String.format(
+                                                    "%02d",
+                                                    month + 1
+                                            ) +
+                                            "-" +
+                                            String.format(
+                                                    "%02d",
+                                                    day
+                                            );
+
+                            etDate.setText(
+                                    selectedDate
+                            );
+
+                            preferencesManager.saveLastDate(
+                                    selectedDate
+                            );
+
+                            new NasaTask().execute(
+                                    selectedDate
+                            );
+                        },
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                );
+
+
+        dialog.show();
     }
 
     /**
 
-     * Handles toolbar menu selections.
-     *
-     * @param item selected menu item
-     * @return true when the item is handled
+     * Searches NASA APOD using the date
+     * entered into the EditText.
      */
-    @Override
-    public boolean onOptionsItemSelected(
-            @NonNull MenuItem item
-    ) {
+    private void searchByEnteredDate() {
 
-        if (item.getItemId() == R.id.menu_help) {
+        String enteredDate =
+                etDate.getText()
+                        .toString()
+                        .trim();
+
+        if (enteredDate.isEmpty()) {
 
 
-            showHelp();
+            etDate.setError(
+                    "Enter a date"
+            );
 
-            return true;
+            etDate.requestFocus();
+
+            return;
 
 
         }
 
-        return super.onOptionsItemSelected(item);
+        if (!enteredDate.matches(
+                "\\d{4}-\\d{2}-\\d{2}"
+        )) {
+
+
+            etDate.setError(
+                    "Use YYYY-MM-DD format"
+            );
+
+            etDate.requestFocus();
+
+            return;
+
+
+        }
+
+        selectedDate = enteredDate;
+
+        preferencesManager.saveLastDate(
+                selectedDate
+        );
+
+        new NasaTask().execute(
+                selectedDate
+        );
     }
 
     /**
 
-     * Displays the Help dialog.
-     */
-    private void showHelp() {
-
-        new AlertDialog.Builder(this)
-                .setTitle(
-                        "NASA Image Explorer Help"
-                )
-                .setMessage(
-                        "Use Select Date to search for a NASA image.\n\n"
-                                + "The selected image can be saved "
-                                + "to Favorites.\n\n"
-                                + "Use the Help menu for application "
-                                + "instructions."
-                )
-                .setPositiveButton(
-                        "OK",
-                        null
-                )
-                .show();
-    }
-
-    /**
-
-     * Saves the currently displayed image.
+     * Saves the currently displayed image
+     * as a favorite.
      *
-     * @param view button view
+     * @param view clicked view
      */
     private void saveFavorite(View view) {
 
@@ -232,7 +266,7 @@ public class SearchActivity extends AppCompatActivity {
 
             Toast.makeText(
                     this,
-                    "Please search for an image first",
+                    "Search for an image first",
                     Toast.LENGTH_SHORT
             ).show();
 
@@ -241,15 +275,12 @@ public class SearchActivity extends AppCompatActivity {
 
         }
 
-        boolean saved =
-                favoriteDao.addFavorite(
-                        selectedDate,
-                        imageTitle,
-                        imageUrl,
-                        imageHdUrl
-                );
-
-        if (saved) {
+        if (favoriteDao.addFavorite(
+                selectedDate,
+                imageTitle,
+                imageUrl,
+                hdUrl
+        )) {
 
 
             Snackbar.make(
@@ -274,62 +305,6 @@ public class SearchActivity extends AppCompatActivity {
 
     /**
 
-     * Displays the date picker.
-     */
-    private void showDatePicker() {
-
-        Calendar calendar =
-                Calendar.getInstance();
-
-        DatePickerDialog dialog =
-                new DatePickerDialog(
-                        this,
-                        (
-                                DatePicker view,
-                                int year,
-                                int month,
-                                int day
-                        ) -> {
-
-
-                            selectedDate =
-                                    year
-                                            + "-"
-                                            + String.format(
-                                            "%02d",
-                                            month + 1
-                                    )
-                                            + "-"
-                                            + String.format(
-                                            "%02d",
-                                            day
-                                    );
-
-                            preferencesManager.saveLastDate(
-                                    selectedDate
-                            );
-
-                            new NasaTask().execute(
-                                    selectedDate
-                            );
-                        },
-                        calendar.get(
-                                Calendar.YEAR
-                        ),
-                        calendar.get(
-                                Calendar.MONTH
-                        ),
-                        calendar.get(
-                                Calendar.DAY_OF_MONTH
-                        )
-                );
-
-
-        dialog.show();
-    }
-
-    /**
-
      * Performs the NASA API request.
      */
     private class NasaTask
@@ -343,8 +318,6 @@ public class SearchActivity extends AppCompatActivity {
                     View.VISIBLE
             );
 
-            btnSave.setEnabled(false);
-
 
         }
 
@@ -354,7 +327,8 @@ public class SearchActivity extends AppCompatActivity {
         ) {
 
 
-            HttpURLConnection connection = null;
+            HttpURLConnection connection =
+                    null;
 
             try {
 
@@ -374,6 +348,14 @@ public class SearchActivity extends AppCompatActivity {
                         "GET"
                 );
 
+                connection.setConnectTimeout(
+                        10000
+                );
+
+                connection.setReadTimeout(
+                        10000
+                );
+
                 BufferedReader reader =
                         new BufferedReader(
                                 new InputStreamReader(
@@ -386,10 +368,8 @@ public class SearchActivity extends AppCompatActivity {
 
                 String line;
 
-                while (
-                        (line = reader.readLine())
-                                != null
-                ) {
+                while ((line =
+                        reader.readLine()) != null) {
 
                     result.append(line);
                 }
@@ -423,13 +403,12 @@ public class SearchActivity extends AppCompatActivity {
                     View.GONE
             );
 
-            btnSave.setEnabled(true);
-
-            if (result == null) {
+            if (result == null
+                    || result.isEmpty()) {
 
                 Toast.makeText(
                         SearchActivity.this,
-                        "Error loading data",
+                        "Error loading NASA data",
                         Toast.LENGTH_SHORT
                 ).show();
 
@@ -451,7 +430,7 @@ public class SearchActivity extends AppCompatActivity {
                                 "url"
                         );
 
-                imageHdUrl =
+                hdUrl =
                         object.optString(
                                 "hdurl",
                                 ""
