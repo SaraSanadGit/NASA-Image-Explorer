@@ -2,7 +2,6 @@
 
 <resources>
 
-    ```
     <string name="app_name">Explorateur d\'images NASA</string>
 
     <string name="open_drawer">Ouvrir le menu de navigation</string>
@@ -26,6 +25,6 @@
     <string name="choose_date">Choisir une date</string>
 
     <string name="favorite_images">Images NASA favorites</string>
-    ```
+
 
 </resources>

@@ -6,6 +6,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.sara.nasaimageexplorer.adapter.FavoriteAdapter;
 import com.sara.nasaimageexplorer.business.FavoriteService;
@@ -16,16 +17,17 @@ import com.sara.nasaimageexplorer.model.FavoriteImage;
 import java.util.ArrayList;
 
 /**
-
  * Displays saved NASA favorite images.
  *
  * Uses FavoriteService from the Business layer
  * for favorite image operations.
  *
  * @author Sara
- * @version 8.2
+ * @version 8.3
  */
 public class FavoritesActivity extends AppCompatActivity {
+
+    private Toolbar toolbarFavorites;
 
     private ListView listFavorites;
 
@@ -40,7 +42,6 @@ public class FavoritesActivity extends AppCompatActivity {
     private FavoriteAdapter adapter;
 
     /**
-
      * Creates the Favorites activity.
      *
      * @param savedInstanceState saved activity state
@@ -53,6 +54,22 @@ public class FavoritesActivity extends AppCompatActivity {
         setContentView(
                 R.layout.activity_favorites
         );
+
+        toolbarFavorites =
+                findViewById(
+                        R.id.toolbarFavorites
+                );
+
+        setSupportActionBar(
+                toolbarFavorites
+        );
+
+        if (getSupportActionBar() != null) {
+
+            getSupportActionBar().setTitle(
+                    "Favorites - Version 1.0"
+            );
+        }
 
         listFavorites =
                 findViewById(
@@ -74,7 +91,6 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
     /**
-
      * Loads favorite images through the Business layer.
      */
     private void loadFavorites() {
@@ -87,7 +103,6 @@ public class FavoritesActivity extends AppCompatActivity {
                         this,
                         favorites,
                         new FavoriteAdapter.OnFavoriteClickListener() {
-
 
                             @Override
                             public void onFavoriteClick(
@@ -111,14 +126,12 @@ public class FavoritesActivity extends AppCompatActivity {
                         }
                 );
 
-
         listFavorites.setAdapter(
                 adapter
         );
     }
 
     /**
-
      * Opens the details screen for a favorite image.
      *
      * @param favorite selected favorite image
@@ -142,7 +155,6 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
     /**
-
      * Deletes a favorite image through the Business layer.
      *
      * @param favorite favorite image to delete
@@ -158,7 +170,6 @@ public class FavoritesActivity extends AppCompatActivity {
 
         if (deleted) {
 
-
             favorites.remove(
                     favorite
             );
@@ -171,22 +182,17 @@ public class FavoritesActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
 
-
         } else {
-
 
             Toast.makeText(
                     this,
                     "Delete failed",
                     Toast.LENGTH_SHORT
             ).show();
-
-
         }
     }
 
     /**
-
      * Reloads favorites when returning to this activity.
      */
     @Override
@@ -196,10 +202,8 @@ public class FavoritesActivity extends AppCompatActivity {
 
         if (favoriteService != null) {
 
-
             loadFavorites();
-
-
         }
     }
 }
+

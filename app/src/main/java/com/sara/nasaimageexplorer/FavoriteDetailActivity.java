@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.sara.nasaimageexplorer.business.FavoriteService;
@@ -17,16 +18,17 @@ import com.sara.nasaimageexplorer.database.FavoriteDao;
 import com.sara.nasaimageexplorer.model.FavoriteImage;
 
 /**
-
- * Displays details of a selected favorite NASA image.
+ * Displays details of a selected NASA favorite image.
  *
  * Uses FavoriteService from the Business layer
  * for favorite image operations.
  *
  * @author Sara
- * @version 8.3
+ * @version 8.4
  */
 public class FavoriteDetailActivity extends AppCompatActivity {
+
+    private Toolbar toolbarFavoriteDetail;
 
     private ImageView imgFavorite;
 
@@ -49,7 +51,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
     private FavoriteImage favoriteImage;
 
     /**
-
      * Creates the Favorite Detail activity.
      *
      * @param savedInstanceState saved activity state
@@ -64,6 +65,22 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         setContentView(
                 R.layout.activity_favorite_detail
         );
+
+        toolbarFavoriteDetail =
+                findViewById(
+                        R.id.toolbarFavoriteDetail
+                );
+
+        setSupportActionBar(
+                toolbarFavoriteDetail
+        );
+
+        if (getSupportActionBar() != null) {
+
+            getSupportActionBar().setTitle(
+                    "Favorite Detail - Version 1.0"
+            );
+        }
 
         imgFavorite =
                 findViewById(
@@ -114,7 +131,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         if (favoriteId == -1) {
 
-
             Toast.makeText(
                     this,
                     "Favorite not found",
@@ -124,8 +140,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
             finish();
 
             return;
-
-
         }
 
         loadFavorite(favoriteId);
@@ -145,7 +159,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         tvFavoriteHdUrl.setOnClickListener(
                 v -> {
 
-
                     if (favoriteImage != null) {
 
                         openUrl(
@@ -153,13 +166,10 @@ public class FavoriteDetailActivity extends AppCompatActivity {
                         );
                     }
                 }
-
-
         );
     }
 
     /**
-
      * Loads the selected favorite through
      * the Business layer.
      *
@@ -176,7 +186,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         if (favoriteImage == null) {
 
-
             Toast.makeText(
                     this,
                     "Favorite not found",
@@ -186,8 +195,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
             finish();
 
             return;
-
-
         }
 
         tvFavoriteTitle.setText(
@@ -208,20 +215,15 @@ public class FavoriteDetailActivity extends AppCompatActivity {
         if (hdUrl != null
                 && !hdUrl.isEmpty()) {
 
-
             tvFavoriteHdUrl.setText(
                     hdUrl
             );
 
-
         } else {
-
 
             tvFavoriteHdUrl.setText(
                     "HD image not available"
             );
-
-
         }
 
         Glide.with(this)
@@ -238,7 +240,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
     }
 
     /**
-
      * Deletes the current favorite image
      * through the Business layer.
      */
@@ -246,10 +247,7 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         if (favoriteImage == null) {
 
-
             return;
-
-
         }
 
         boolean deleted =
@@ -259,7 +257,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         if (deleted) {
 
-
             Toast.makeText(
                     this,
                     "Removed from Favorites",
@@ -268,22 +265,17 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
             finish();
 
-
         } else {
-
 
             Toast.makeText(
                     this,
                     "Delete failed",
                     Toast.LENGTH_SHORT
             ).show();
-
-
         }
     }
 
     /**
-
      * Opens a URL in the Android browser.
      *
      * @param urlString URL to open
@@ -298,7 +290,6 @@ public class FavoriteDetailActivity extends AppCompatActivity {
                 "HD image not available"
         )) {
 
-
             Toast.makeText(
                     this,
                     "URL not available",
@@ -306,12 +297,9 @@ public class FavoriteDetailActivity extends AppCompatActivity {
             ).show();
 
             return;
-
-
         }
 
         try {
-
 
             Intent browserIntent =
                     new Intent(
@@ -323,17 +311,14 @@ public class FavoriteDetailActivity extends AppCompatActivity {
                     browserIntent
             );
 
-
         } catch (Exception e) {
-
 
             Toast.makeText(
                     this,
                     "Unable to open URL",
                     Toast.LENGTH_SHORT
             ).show();
-
-
         }
     }
 }
+

@@ -141,7 +141,7 @@ public class SearchActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
 
             getSupportActionBar().setTitle(
-                    "Search NASA Image"
+                    "Search NASA Image - Version 1.0"
             );
         }
 
